@@ -434,7 +434,7 @@
             
             const squadStats = document.getElementById('squad-stats');
             squadStats.innerHTML = '';
-            GRUPOS.forEach((g) => {
+GRUPOS.forEach((g) => {
                 const groupP = participants.filter(p => p.grupoId === g.id);
                 const gVivos = groupP.filter(p => p.estado === 'Vivo').length;
                 const gAsim = groupP.filter(p => p.estado === 'Vivo' && p.rol !== 'Humano').length;
@@ -445,6 +445,38 @@
                 squadStats.appendChild(div);
             });
         }
+
+        // ========================================================
+        // CONEXIÓN CON GOOGLE SHEETS (OUTPOST 31 DATABASE)
+        // ========================================================
+        function enviarAGoogleSheets(datosCualquiera) {
+            const scriptURL = https://script.google.com/macros/s/AKfycbxhogQZD1oC79yvDm5rdJLUq3yQnnYMLGFXPxLhRcxmX-zkDqR7jS67-i3lUJdpW43i/exec; // <-- PON TU URL DE GOOGLE AQUÍ
+            const formData = new URLSearchParams();
+            
+            formData.append('ID', datosCualquiera.id || '');
+            formData.append('Nombre', datosCualquiera.nombre || '');
+            formData.append('Especialidad', datosCualquiera.especialidad || '');
+            formData.append('Estado', datosCualquiera.estado || '');
+            formData.append('Rol_Biologico', datosCualquiera.rol || '');
+            formData.append('Nivel_Infeccion', datosCualquiera.infeccion || 0);
+            formData.append('Grupo', datosCualquiera.grupo || '');
+
+            log("SISTEMA: Sincronizando registro biométrico con servidor externo...", "text-yellow-500");
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                log("SISTEMA: Sincronización con Base de Datos Externa... OK", "text-green-400");
+            })
+            .catch(error => {
+                log("ALERTA: Error en la conexión satelital biométrica.", "text-red-500");
+                console.error('Error:', error);
+            });
+        }
+        // ========================================================
 
         function log(msg, color = 'text-green-500') {
             const term = document.getElementById('terminal');
